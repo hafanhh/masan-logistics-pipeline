@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  pipeline:
+    build: .
+    volumes:
+      - ./data_source:/app/data_source      # mount data vào
+      - ./bronze_layer:/app/bronze_layer    # output ra ngoài
+      - ./silver_layer:/app/silver_layer
+      - ./gold_layer:/app/gold_layer
+    command: >
+      sh -c "python connector.py &&
+             python schema_validator.py &&
+             python spark_processor.py &&
+             python silver_processor.py &&
+             python gold_processor.py"
