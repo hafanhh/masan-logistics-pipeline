@@ -1,0 +1,5 @@
+customer_state,total_orders,avg_delivery_days,avg_delay_days,late_orders,late_rate_pct,median_delivery_days,rank_slowest
+RR,41,29.3,-17.3,5,12.2,25,1
+AP,67,27.2,-19.7,2,3.0,25,2
+AM,145,26.4,-19.6,4,2.8,26,3
+AL,397,24.5,-8.7,85,21.4,22,4
