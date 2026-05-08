@@ -1,0 +1,23 @@
+# Data files — quá lớn cho GitHub
+data_source/
+bronze_layer/
+silver_layer/
+gold_layer/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Spark logs
+derby.log
+metastore_db/
+spark-warehouse/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
