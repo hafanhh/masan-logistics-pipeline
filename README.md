@@ -194,6 +194,16 @@ gold_processor    → gold_layer/*.csv (KPI analyst-ready)
 
 ---
 
+## Charts
+
+![Monthly Trend](charts/chart_monthly_trend.png)
+
+![Late Rate by State](charts/chart_late_rate_by_state.png)
+
+![Delivery Speed](charts/chart_delivery_speed.png)
+
+---
+
 ## Những điểm kỹ thuật đáng chú ý
 
 **Schema-first approach** — Không dùng `inferSchema=True`. Mọi schema đều khai báo tường minh trong `SPARK_SCHEMAS` và `EXPECTED_SCHEMAS`. Đây là nguyên tắc bắt buộc trong Palantir Foundry để đảm bảo data lineage.

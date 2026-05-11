@@ -1,0 +1,85 @@
+2026-05-11 11:41:59,749 | INFO | main | ╔═════════════════════════════════════════════════════╗
+2026-05-11 11:41:59,749 | INFO | main | ║       MASAN LOGISTICS DATA PIPELINE               ║
+2026-05-11 11:41:59,749 | INFO | main | ║       Palantir Foundry Style — PySpark 4.x        ║
+2026-05-11 11:41:59,749 | INFO | main | ╚═════════════════════════════════════════════════════╝
+2026-05-11 11:41:59,749 | INFO | main | Start time : 2026-05-11 11:41:59
+2026-05-11 11:41:59,749 | INFO | main | Step       : all
+2026-05-11 11:41:59,749 | INFO | main | Log file   : /home/vmo/masan_palantir/logs/pipeline_20260511_114159.log
+2026-05-11 11:41:59,749 | INFO | main | Base dir   : /home/vmo/masan_palantir
+
+2026-05-11 11:41:59,749 | INFO | main | =======================================================
+2026-05-11 11:41:59,749 | INFO | main | STEP 1 — DATA INGESTION
+2026-05-11 11:41:59,749 | INFO | main | =======================================================
+2026-05-11 11:41:59,854 | INFO | connector | === Bắt đầu kết nối source: orders' ===
+2026-05-11 11:42:00,016 | INFO | connector | Đọc thành công: 99,441 dòng, 8 cột
+2026-05-11 11:42:00,016 | INFO | connector | Source 'orders' kết nối thành công trong 0.16s
+2026-05-11 11:42:00,016 | INFO | connector | Columns: ['order_id', 'customer_id', 'order_status', 'order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date']
+2026-05-11 11:42:00,052 | INFO | connector | Null counts:
+{'order_approved_at': 160, 'order_delivered_carrier_date': 1783, 'order_delivered_customer_date': 2965}
+2026-05-11 11:42:00,052 | INFO | main |  orders: 99,441 rows | 0.20s
+2026-05-11 11:42:00,052 | INFO | connector | === Bắt đầu kết nối source: customers' ===
+2026-05-11 11:42:00,128 | INFO | connector | Đọc thành công: 99,441 dòng, 5 cột
+2026-05-11 11:42:00,129 | INFO | connector | Source 'customers' kết nối thành công trong 0.08s
+2026-05-11 11:42:00,129 | INFO | connector | Columns: ['customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state']
+2026-05-11 11:42:00,147 | INFO | connector | Null counts:
+{}
+2026-05-11 11:42:00,153 | INFO | main |  customers: 99,441 rows | 0.10s
+2026-05-11 11:42:00,154 | INFO | connector | === Bắt đầu kết nối source: geolocation' ===
+2026-05-11 11:42:00,478 | INFO | connector | Đọc thành công: 1,000,163 dòng, 5 cột
+2026-05-11 11:42:00,478 | INFO | connector | Source 'geolocation' kết nối thành công trong 0.32s
+2026-05-11 11:42:00,478 | INFO | connector | Columns: ['geolocation_zip_code_prefix', 'geolocation_lat', 'geolocation_lng', 'geolocation_city', 'geolocation_state']
+2026-05-11 11:42:00,563 | INFO | connector | Null counts:
+{}
+2026-05-11 11:42:00,566 | INFO | main |  geolocation: 1,000,163 rows | 0.41s
+2026-05-11 11:42:00,567 | INFO | main | STEP 1 DONE
+
+2026-05-11 11:42:00,570 | INFO | main | =======================================================
+2026-05-11 11:42:00,570 | INFO | main | STEP 2 — SCHEMA VALIDATION
+2026-05-11 11:42:00,570 | INFO | main | =======================================================
+2026-05-11 11:42:00,571 | INFO | connector | === Bắt đầu kết nối source: orders' ===
+2026-05-11 11:42:00,736 | INFO | connector | Đọc thành công: 99,441 dòng, 8 cột
+2026-05-11 11:42:00,736 | INFO | connector | Source 'orders' kết nối thành công trong 0.17s
+2026-05-11 11:42:00,736 | INFO | connector | Columns: ['order_id', 'customer_id', 'order_status', 'order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date']
+2026-05-11 11:42:00,771 | INFO | connector | Null counts:
+{'order_approved_at': 160, 'order_delivered_carrier_date': 1783, 'order_delivered_customer_date': 2965}
+2026-05-11 11:42:00,771 | INFO | connector | === Bắt đầu kết nối source: customers' ===
+2026-05-11 11:42:00,842 | INFO | connector | Đọc thành công: 99,441 dòng, 5 cột
+2026-05-11 11:42:00,843 | INFO | connector | Source 'customers' kết nối thành công trong 0.07s
+2026-05-11 11:42:00,843 | INFO | connector | Columns: ['customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state']
+2026-05-11 11:42:00,860 | INFO | connector | Null counts:
+{}
+2026-05-11 11:42:00,860 | INFO | connector | === Bắt đầu kết nối source: geolocation' ===
+2026-05-11 11:42:01,180 | INFO | connector | Đọc thành công: 1,000,163 dòng, 5 cột
+2026-05-11 11:42:01,180 | INFO | connector | Source 'geolocation' kết nối thành công trong 0.32s
+2026-05-11 11:42:01,180 | INFO | connector | Columns: ['geolocation_zip_code_prefix', 'geolocation_lat', 'geolocation_lng', 'geolocation_city', 'geolocation_state']
+2026-05-11 11:42:01,262 | INFO | connector | Null counts:
+{}
+2026-05-11 11:42:01,312 | INFO | main | STEP 2 DONE
+
+2026-05-11 11:42:03,778 | INFO | main | =======================================================
+2026-05-11 11:42:03,779 | INFO | main | STEP 3 — BRONZE LAYER
+2026-05-11 11:42:03,779 | INFO | main | =======================================================
+2026-05-11 11:42:11,654 | INFO | main |   Bronze rows: 99,515
+2026-05-11 11:42:11,654 | INFO | main |   Output: /home/vmo/masan_palantir/bronze_layer/orders_enriched
+2026-05-11 11:42:11,654 | INFO | main | STEP 3 DONE
+
+2026-05-11 11:42:11,654 | INFO | main | =======================================================
+2026-05-11 11:42:11,655 | INFO | main | STEP 4 — SILVER LAYER
+2026-05-11 11:42:11,655 | INFO | main | =======================================================
+2026-05-11 11:42:16,234 | INFO | main |   Silver rows: 99,515
+2026-05-11 11:42:16,234 | INFO | main |   Output: /home/vmo/masan_palantir/silver_layer/orders_cleaned
+2026-05-11 11:42:16,234 | INFO | main | STEP 4 DONE
+
+2026-05-11 11:42:16,235 | INFO | main | =======================================================
+2026-05-11 11:42:16,235 | INFO | main | STEP 5 — GOLD LAYER
+2026-05-11 11:42:16,235 | INFO | main | =======================================================
+2026-05-11 11:42:21,186 | INFO | main |   Output: /home/vmo/masan_palantir/gold_layer/
+2026-05-11 11:42:21,186 | INFO | main | STEP 5 DONE
+
+2026-05-11 11:42:21,412 | INFO | main | ╔═════════════════════════════════════════════════════╗
+2026-05-11 11:42:21,412 | INFO | main | ║  PIPELINE HOÀN THÀNH THÀNH CÔNG                   ║
+2026-05-11 11:42:21,412 | INFO | main | ╚═════════════════════════════════════════════════════╝
+2026-05-11 11:42:21,413 | INFO | main | Tổng thời gian : 21.7s (0.4 phút)
+2026-05-11 11:42:21,413 | INFO | main | Log đã lưu tại : /home/vmo/masan_palantir/logs/pipeline_20260511_114159.log
+2026-05-11 11:42:21,413 | INFO | main | Gold output    : /home/vmo/masan_palantir/gold_layer/
+2026-05-11 11:42:21,414 | INFO | py4j.clientserver | Closing down clientserver connection

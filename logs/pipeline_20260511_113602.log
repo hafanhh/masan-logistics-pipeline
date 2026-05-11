@@ -1,0 +1,65 @@
+2026-05-11 11:36:02,815 | INFO | main | ╔═════════════════════════════════════════════════════╗
+2026-05-11 11:36:02,816 | INFO | main | ║       MASAN LOGISTICS DATA PIPELINE               ║
+2026-05-11 11:36:02,816 | INFO | main | ║       Palantir Foundry Style — PySpark 4.x        ║
+2026-05-11 11:36:02,816 | INFO | main | ╚═════════════════════════════════════════════════════╝
+2026-05-11 11:36:02,816 | INFO | main | Start time : 2026-05-11 11:36:02
+2026-05-11 11:36:02,816 | INFO | main | Step       : all
+2026-05-11 11:36:02,816 | INFO | main | Log file   : /home/vmo/masan_palantir/logs/pipeline_20260511_113602.log
+2026-05-11 11:36:02,816 | INFO | main | Base dir   : /home/vmo/masan_palantir
+
+2026-05-11 11:36:02,816 | INFO | main | =======================================================
+2026-05-11 11:36:02,816 | INFO | main | STEP 1 — DATA INGESTION
+2026-05-11 11:36:02,816 | INFO | main | =======================================================
+2026-05-11 11:36:02,922 | INFO | connector | === Bắt đầu kết nối source: orders' ===
+2026-05-11 11:36:03,099 | INFO | connector | Đọc thành công: 99,441 dòng, 8 cột
+2026-05-11 11:36:03,099 | INFO | connector | Source 'orders' kết nối thành công trong 0.18s
+2026-05-11 11:36:03,099 | INFO | connector | Columns: ['order_id', 'customer_id', 'order_status', 'order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date']
+2026-05-11 11:36:03,135 | INFO | connector | Null counts:
+{'order_approved_at': 160, 'order_delivered_carrier_date': 1783, 'order_delivered_customer_date': 2965}
+2026-05-11 11:36:03,136 | INFO | main |   ✓ orders: 99,441 rows | 0.21s
+2026-05-11 11:36:03,136 | INFO | connector | === Bắt đầu kết nối source: customers' ===
+2026-05-11 11:36:03,210 | INFO | connector | Đọc thành công: 99,441 dòng, 5 cột
+2026-05-11 11:36:03,211 | INFO | connector | Source 'customers' kết nối thành công trong 0.08s
+2026-05-11 11:36:03,211 | INFO | connector | Columns: ['customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state']
+2026-05-11 11:36:03,229 | INFO | connector | Null counts:
+{}
+2026-05-11 11:36:03,236 | INFO | main |   ✓ customers: 99,441 rows | 0.10s
+2026-05-11 11:36:03,236 | INFO | connector | === Bắt đầu kết nối source: geolocation' ===
+2026-05-11 11:36:03,576 | INFO | connector | Đọc thành công: 1,000,163 dòng, 5 cột
+2026-05-11 11:36:03,576 | INFO | connector | Source 'geolocation' kết nối thành công trong 0.34s
+2026-05-11 11:36:03,576 | INFO | connector | Columns: ['geolocation_zip_code_prefix', 'geolocation_lat', 'geolocation_lng', 'geolocation_city', 'geolocation_state']
+2026-05-11 11:36:03,663 | INFO | connector | Null counts:
+{}
+2026-05-11 11:36:03,666 | INFO | main |   ✓ geolocation: 1,000,163 rows | 0.43s
+2026-05-11 11:36:03,667 | INFO | main | STEP 1 DONE
+
+2026-05-11 11:36:03,670 | INFO | main | =======================================================
+2026-05-11 11:36:03,670 | INFO | main | STEP 2 — SCHEMA VALIDATION
+2026-05-11 11:36:03,670 | INFO | main | =======================================================
+2026-05-11 11:36:03,671 | INFO | connector | === Bắt đầu kết nối source: orders' ===
+2026-05-11 11:36:03,855 | INFO | connector | Đọc thành công: 99,441 dòng, 8 cột
+2026-05-11 11:36:03,855 | INFO | connector | Source 'orders' kết nối thành công trong 0.18s
+2026-05-11 11:36:03,855 | INFO | connector | Columns: ['order_id', 'customer_id', 'order_status', 'order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date']
+2026-05-11 11:36:03,892 | INFO | connector | Null counts:
+{'order_approved_at': 160, 'order_delivered_carrier_date': 1783, 'order_delivered_customer_date': 2965}
+2026-05-11 11:36:03,892 | INFO | connector | === Bắt đầu kết nối source: customers' ===
+2026-05-11 11:36:03,969 | INFO | connector | Đọc thành công: 99,441 dòng, 5 cột
+2026-05-11 11:36:03,970 | INFO | connector | Source 'customers' kết nối thành công trong 0.08s
+2026-05-11 11:36:03,970 | INFO | connector | Columns: ['customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state']
+2026-05-11 11:36:03,989 | INFO | connector | Null counts:
+{}
+2026-05-11 11:36:03,989 | INFO | connector | === Bắt đầu kết nối source: geolocation' ===
+2026-05-11 11:36:04,377 | INFO | connector | Đọc thành công: 1,000,163 dòng, 5 cột
+2026-05-11 11:36:04,377 | INFO | connector | Source 'geolocation' kết nối thành công trong 0.39s
+2026-05-11 11:36:04,377 | INFO | connector | Columns: ['geolocation_zip_code_prefix', 'geolocation_lat', 'geolocation_lng', 'geolocation_city', 'geolocation_state']
+2026-05-11 11:36:04,466 | INFO | connector | Null counts:
+{}
+2026-05-11 11:36:04,466 | ERROR | main | Pipeline FAILED: 'orders_x_customers'
+Traceback (most recent call last):
+  File "/home/vmo/masan_palantir/main.py", line 213, in main
+    run_schema_validation()
+  File "/home/vmo/masan_palantir/main.py", line 92, in run_schema_validation
+    report1 = check_join_compatibility(df_orders, df_customers, "orders_x_customers")
+  File "/home/vmo/masan_palantir/schema_validator.py", line 35, in check_join_compatibility
+    contract = JOIN_CONTRACT[contract_name]
+KeyError: 'orders_x_customers'
