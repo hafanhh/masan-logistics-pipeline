@@ -4,6 +4,12 @@ bronze_layer/
 silver_layer/
 gold_layer/
 
+# Logs — generated files với timestamp
+logs/
+
+# Charts — generated visualization files
+charts/
+
 # Python cache
 __pycache__/
 *.pyc

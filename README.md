@@ -1,17 +1,17 @@
 # Masan Logistics Data Pipeline
-> Mô phỏng kiến trúc Palantir Foundry — xử lý 1M+ rows với PySpark theo mô hình Medallion (Bronze → Silver → Gold)
+> Simulating Palantir Foundry Architecture — Processing 1M+ rows with PySpark using Medallion Architecture (Bronze → Silver → Gold)
 
 ---
 
-## Bối cảnh
+## Overview
 
-Tại **Masan Group**, dữ liệu logistics đến từ nhiều hệ thống riêng biệt: ERP (đơn hàng), CRM (khách hàng), và hệ thống Logistics (tọa độ giao hàng). Các nguồn này có schema không đồng nhất, chất lượng dữ liệu không đảm bảo, và khối lượng lên đến hàng triệu bản ghi.
+At **Masan Group**, logistics data comes from separate systems: ERP (orders), CRM (customers), and Logistics (coordinates). These sources have inconsistent schemas, uncertain data quality, and volumes reaching millions of records.
 
-Project này mô phỏng lại quy trình xây dựng data pipeline theo phong cách **Palantir Foundry** — từ kết nối nguồn dữ liệu thô đến tạo ra KPI sẵn sàng cho analyst — sử dụng dataset OLIST Brazil (e-commerce thực tế) làm dữ liệu thay thế.
+This project simulates the **Palantir Foundry** data pipeline process — from connecting raw data sources to creating analyst-ready KPIs — using the OLIST Brazil e-commerce dataset as a substitute.
 
 ---
 
-## Kiến trúc Pipeline
+## Pipeline Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -23,17 +23,17 @@ Project này mô phỏng lại quy trình xây dựng data pipeline theo phong c
              ▼               ▼                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    DATA INGESTION LAYER                         │
-│  connector.py — Định nghĩa Source, validate schema tự động      │
-│  schema_validator.py — Kiểm tra join compatibility giữa nguồn   │
+│  connector.py — Define Sources, automatic schema validation     │
+│  schema_validator.py — Check join compatibility between sources │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    BRONZE LAYER  (Raw)                          │
 │  spark_processor.py                                             │
-│  • Join 3 nguồn bằng PySpark                                    │
+│  • Join 3 sources with PySpark                                  │
 │  • Dedup geolocation: 1,000,163 → 19,023 unique zip codes       │
-│  • Output: Parquet + Snappy (~88% nhỏ hơn CSV gốc)             │
+│  • Output: Parquet + Snappy (~88% smaller than original CSV)   │
 │  • 99,515 rows | 18 columns                                     │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
@@ -42,10 +42,10 @@ Project này mô phỏng lại quy trình xây dựng data pipeline theo phong c
 │                    SILVER LAYER  (Cleaned)                      │
 │  silver_processor.py                                            │
 │  • Fix 5 timestamp columns: string → datetime                   │
-│  • Impute 278 đơn thiếu tọa độ (avg by state)                  │
-│  • Phát hiện và fix 8 tọa độ ngoài biên giới Brazil            │
-│  • Tính: actual_delivery_days, delay_days, delivery_speed       │
-│  • Partition theo year/month → query nhanh hơn                  │
+│  • Impute 278 orders missing coordinates (avg by state)        │
+│  • Detect and fix 8 coordinates outside Brazil boundaries      │
+│  • Calculate: actual_delivery_days, delay_days, delivery_speed  │
+│  • Partition by year/month → faster queries                     │
 │  • Data Quality: 4/4 checks PASS                                │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
@@ -53,109 +53,136 @@ Project này mô phỏng lại quy trình xây dựng data pipeline theo phong c
 ┌─────────────────────────────────────────────────────────────────┐
 │                    GOLD LAYER  (Analyst-Ready)                  │
 │  gold_processor.py                                              │
-│  • KPI 1: Hiệu suất giao hàng theo State (27 states)           │
-│  • KPI 2: Trend đơn hàng theo tháng (2016–2018)                │
-│  • KPI 3: Phân tích đơn giao trễ theo severity                 │
+│  • KPI 1: Delivery performance by State (27 states)            │
+│  • KPI 2: Order trend by month (2016–2018)                      │
+│  • KPI 3: Late order analysis by severity                       │
 │  • KPI 4: Executive Summary                                     │
-│  • Output: CSV + Parquet sẵn sàng cho analyst                  │
+│  • Output: CSV + Parquet ready for analysts                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Key Insights từ Data
+## Key Insights from Data
 
-| Metric | Giá trị | Ý nghĩa với Masan |
-|--------|---------|-------------------|
-| Tổng đơn hàng | 99,515 | — |
-| Tỷ lệ giao thành công | 97.0% | Benchmark logistics partner |
-| Trung bình ngày giao | 12.5 ngày | SLA baseline |
-| Tỷ lệ giao trễ | 6.6% (6,539 đơn) | Target cải thiện |
-| Đơn giao nhanh ≤7 ngày | 30.9% | Tiềm năng tăng trải nghiệm |
-| State chậm nhất | RR — 29.3 ngày | Cần SLA riêng |
-| State nhanh nhất | SP — 8.7 ngày | Benchmark nội bộ |
-| Tháng cao điểm | 2017-11 (Black Friday) | Late rate tăng 4% → 12% |
-| Đơn CRITICAL (trễ >14 ngày) | 1,385 đơn, max 188 ngày | Ưu tiên xử lý khiếu nại |
+| Metric | Value | Meaning for Masan |
+|--------|-------|-------------------|
+| Total Orders | 99,515 | — |
+| Success Rate | 97.0% | Logistics partner benchmark |
+| Avg Delivery Days | 12.5 days | SLA baseline |
+| Late Rate | 6.6% (6,539 orders) | Target for improvement |
+| Fast Delivery ≤7 days | 30.9% | Potential to improve experience |
+| Slowest State | RR — 29.3 days | Needs separate SLA |
+| Fastest State | SP — 8.7 days | Internal benchmark |
+| Peak Month | 2017-11 (Black Friday) | Late rate increased 4% → 12% |
+| CRITICAL Orders (late >14 days) | 1,385 orders, max 188 days | Priority for complaint handling |
 
 ---
 
-## Cấu trúc thư mục
+## Project Structure
 
 ```
 masan_palantir/
 │
-├── data_source/                    # Raw CSV inputs (không commit lên Git)
-│   ├── orders.csv                  # ERP: 99,441 đơn hàng
-│   ├── customers.csv               # CRM: 99,441 khách hàng
-│   └── geolocation.csv             # Logistics: 1,000,163 tọa độ
+├── data_source/                    # Raw CSV inputs (not committed to Git)
+│   ├── orders.csv                  # ERP: 99,441 orders
+│   ├── customers.csv               # CRM: 99,441 customers
+│   └── geolocation.csv             # Logistics: 1,000,163 coordinates
 │
-├── connector.py                    # Data Ingestion — kết nối và validate source
-├── schema_validator.py             # Schema Enforcement — kiểm tra join compatibility
-├── spark_processor.py              # Bronze Layer — join 3 nguồn với PySpark
+├── config.py                       # Configuration settings
+├── main.py                         # Main pipeline orchestrator
+├── connector.py                    # Data Ingestion — connect and validate sources
+├── schema_validator.py             # Schema Enforcement — check join compatibility
+├── spark_processor.py              # Bronze Layer — join 3 sources with PySpark
 ├── silver_processor.py             # Silver Layer — clean, normalize, derived columns
 ├── gold_processor.py               # Gold Layer — KPI, aggregation, executive summary
+├── dashboard.py                    # Streamlit dashboard for KPI visualization
+├── visualize.py                    # Static chart generation
+├── debug_quality.py                # Data quality debugging utilities
 │
-├── bronze_layer/                   # Output Bronze (Parquet/Snappy)
+├── bronze_layer/                   # Bronze Layer output (Parquet/Snappy)
 │   └── orders_enriched/
+│       └── _SUCCESS
 │
-├── silver_layer/                   # Output Silver (Parquet, partitioned)
+├── silver_layer/                   # Silver Layer output (Parquet, partitioned)
 │   └── orders_cleaned/
 │       ├── order_year=2016/
 │       ├── order_year=2017/
 │       └── order_year=2018/
 │
-└── gold_layer/                     # Output Gold (CSV + Parquet)
-    ├── executive_summary.csv
-    ├── kpi_delivery_by_state.csv
-    ├── kpi_monthly_trend.csv
-    └── kpi_late_orders.csv
+├── gold_layer/                     # Gold Layer output (CSV + Parquet)
+│   ├── executive_summary.csv
+│   ├── kpi_delivery_by_state.csv
+│   ├── kpi_monthly_trend.csv
+│   └── kpi_late_orders.csv
+│
+├── charts/                         # Generated visualization charts
+│   ├── chart_delivery_speed.png
+│   ├── chart_late_rate_by_state.png
+│   └── chart_monthly_trend.png
+│
+├── sample_output/                  # Sample output files for reference
+│   ├── executive_summary_sample.csv
+│   └── kpi_delivery_by_state_sample.csv
+│
+├── logs/                           # Pipeline execution logs
+├── notebooks.ipynb                 # Jupyter notebook for exploration
+├── requirements.txt                # Python dependencies
+├── Dockerfile                      # Docker container definition
+├── docker-compose.yml              # Docker Compose configuration
+└── README.md                       # This file
 ```
 
 ---
 
 ## Tech Stack
 
-| Layer | Tool | Lý do chọn |
-|-------|------|------------|
-| Ingestion | Python + Pandas | Kết nối nguồn, validate schema nhẹ |
-| Processing | PySpark 4.1 | Xử lý 1M+ rows, parallel execution |
-| Storage | Parquet + Snappy | Columnar, nén tốt, query nhanh |
-| Partitioning | year/month | Tối ưu query theo thời gian |
-| Runtime | Java 17 + Miniconda | Tương thích PySpark 4.x |
+| Layer | Tool | Reason for Choice |
+|-------|------|-------------------|
+| Ingestion | Python + Pandas | Source connection, lightweight schema validation |
+| Processing | PySpark 4.1 | Process 1M+ rows, parallel execution |
+| Storage | Parquet + Snappy | Columnar format, good compression, fast queries |
+| Partitioning | year/month | Optimize time-based queries |
+| Visualization | Streamlit + Matplotlib | Interactive dashboard + static charts |
+| Containerization | Docker + Docker Compose | Reproducible environment |
+| Runtime | Java 17 + Python 3.10 | Compatible with PySpark 4.x |
 
 ---
 
 ## Palantir Foundry Mapping
 
-Mỗi thành phần trong project tương đương với khái niệm trong Palantir Foundry:
+Each component in this project corresponds to a concept in Palantir Foundry:
 
-| Project này | Palantir Foundry | Mô tả |
-|-------------|-----------------|-------|
-| `connector.py` | Data Connection | Định nghĩa nguồn, enforce schema ngay khi kết nối |
-| `schema_validator.py` | Schema Enforcement | Kiểm tra join key compatibility trước khi process |
-| Bronze Layer | Raw Dataset | Dữ liệu thô, không transform, giữ lineage |
-| Silver Layer | Foundry Transform | Clean, normalize, tính derived columns |
-| Gold Layer | Ontology / View | KPI sẵn sàng cho analyst và dashboard |
-| Partition by year/month | Dataset Branches | Tối ưu access pattern theo thời gian |
+| This Project | Palantir Foundry | Description |
+|-------------|-----------------|-------------|
+| `connector.py` | Data Connection | Define sources, enforce schema upon connection |
+| `schema_validator.py` | Schema Enforcement | Check join key compatibility before processing |
+| `main.py` | Pipeline Orchestrator | Run entire pipeline with single command |
+| Bronze Layer | Raw Dataset | Raw data, no transformation, maintain lineage |
+| Silver Layer | Foundry Transform | Clean, normalize, calculate derived columns |
+| Gold Layer | Ontology / View | Analyst-ready KPIs and dashboard |
+| `dashboard.py` | Contour (Dashboard) | Interactive KPI visualization |
+| Partition by year/month | Dataset Branches | Optimize access patterns by time |
+| `debug_quality.py` | Data Quality Tools | Debug and validate data quality issues |
 
 ---
 
-## Chạy Pipeline
+## Running the Pipeline
 
-### Yêu cầu
+### Requirements
 
 ```bash
 # Python 3.10+
-pip install pyspark pandas
+pip install -r requirements.txt
 
-# Java 17 (bắt buộc cho PySpark 4.x)
+# Java 17 (required for PySpark 4.x)
 sudo apt install openjdk-17-jdk -y
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ```
 
-### Chuẩn bị data
+### Prepare Data
 
-Tải dataset đặt vào `data_source/` và đổi tên:
+Download the dataset and place in `data_source/` directory with these names:
 
 ```
 → data_source/orders.csv
@@ -163,40 +190,107 @@ Tải dataset đặt vào `data_source/` và đổi tên:
 → data_source/geolocation.csv
 ```
 
-### Chạy từng bước
+### Run Options
+
+#### Option 1: Run Full Pipeline (Recommended)
 
 ```bash
-# Bước 1 — Kiểm tra kết nối và schema
+# Run entire pipeline with single command
+python main.py
+
+# Run specific step only
+python main.py --step bronze    # Bronze layer only
+python main.py --step silver    # Silver layer only
+python main.py --step gold      # Gold layer only
+```
+
+#### Option 2: Run Individual Components
+
+```bash
+# Step 1 — Check connections and schema
 python connector.py
 
-# Bước 2 — Validate join compatibility giữa 3 nguồn
+# Step 2 — Validate join compatibility between 3 sources
 python schema_validator.py
 
-# Bước 3 — Tạo Bronze Layer (join + Parquet)
+# Step 3 — Create Bronze Layer (join + Parquet)
 python spark_processor.py
 
-# Bước 4 — Tạo Silver Layer (clean + normalize)
+# Step 4 — Create Silver Layer (clean + normalize)
 python silver_processor.py
 
-# Bước 5 — Tạo Gold Layer (KPI + executive summary)
+# Step 5 — Create Gold Layer (KPI + executive summary)
 python gold_processor.py
 ```
 
-### Kết quả mong đợi
+#### Option 3: Run with Docker
+
+```bash
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or run individual container
+docker build -t masan-pipeline .
+docker run -v $(pwd)/data_source:/app/data_source -v $(pwd)/bronze_layer:/app/bronze_layer -v $(pwd)/silver_layer:/app/silver_layer -v $(pwd)/gold_layer:/app/gold_layer masan-pipeline
+```
+
+### Expected Results
 
 ```
-connector.py      → 3 sources kết nối thành công, schema validated
+connector.py      → 3 sources connected successfully, schema validated
 schema_validator  → match rate 100% (orders↔customers), 99% (customers↔geo)
 spark_processor   → bronze_layer/orders_enriched/ (Parquet)
 silver_processor  → silver_layer/orders_cleaned/ (partitioned Parquet, 4/4 DQ checks PASS)
-gold_processor    → gold_layer/*.csv (KPI analyst-ready)
+gold_processor    → gold_layer/*.csv (analyst-ready KPIs)
 ```
+
+---
+
+## Dashboard & Visualization
+
+### Interactive Dashboard
+
+```bash
+# Run Streamlit dashboard
+streamlit run dashboard.py
+
+# Access at: http://localhost:8501
+```
+
+**Features:**
+- Executive Summary KPIs
+- Monthly order trends with late rate
+- Delivery speed distribution
+- State performance comparison
+- Late order severity analysis
+- Interactive filters by state
+
+### Static Charts
+
+```bash
+# Generate static visualization charts
+python visualize.py
+```
+
+**Outputs:**
+- `charts/chart_monthly_trend.png` - Order trends over time
+- `charts/chart_delivery_speed.png` - Delivery speed distribution
+- `charts/chart_late_rate_by_state.png` - Late rates by state
 
 ---
 
 ## Charts
 
+### Monthly Order Trend
 ![Monthly Trend](charts/chart_monthly_trend.png)
+
+### Delivery Speed Distribution
+![Delivery Speed](charts/chart_delivery_speed.png)
+
+### Late Rate by State
+![Late Rate by State](charts/chart_late_rate_by_state.png)
+
+---
 
 ![Late Rate by State](charts/chart_late_rate_by_state.png)
 
@@ -204,24 +298,23 @@ gold_processor    → gold_layer/*.csv (KPI analyst-ready)
 
 ---
 
-## Những điểm kỹ thuật đáng chú ý
+## Key Technical Highlights
 
-**Schema-first approach** — Không dùng `inferSchema=True`. Mọi schema đều khai báo tường minh trong `SPARK_SCHEMAS` và `EXPECTED_SCHEMAS`. Đây là nguyên tắc bắt buộc trong Palantir Foundry để đảm bảo data lineage.
+**Schema-first approach** — Don't use `inferSchema=True`. All schemas are explicitly declared in `SPARK_SCHEMAS` and `EXPECTED_SCHEMAS`. This is a mandatory principle in Palantir Foundry to ensure data lineage.
 
-**Không xóa data ở Bronze** — Bronze giữ nguyên 99,515 rows, kể cả dòng có null. Việc xử lý null chỉ xảy ra ở Silver, và mọi quyết định đều được log rõ lý do (`NOT_YET_DELIVERED`, `DATA_QUALITY_ISSUE`).
+**No data deletion in Bronze** — Bronze keeps all 99,515 rows, including null rows. Null handling only occurs in Silver, and all decisions are logged with clear reasons (`NOT_YET_DELIVERED`, `DATA_QUALITY_ISSUE`).
 
-**Imputation có kiểm soát** — Tọa độ thiếu được fill bằng trung bình của cùng state, không phải trung bình toàn bộ dataset. Cột `geo_imputed` đánh dấu các dòng đã được impute để analyst biết.
+**Controlled imputation** — Missing coordinates are filled with averages from the same state, not the entire dataset average. The `geo_imputed` column marks imputed rows for analyst awareness.
 
-**Data Quality gate** — Silver không lưu nếu DQ check FAIL. Đây là pattern quan trọng trong production pipeline để ngăn data xấu lan sang Gold.
+**Data Quality gate** — Silver won't save if DQ checks FAIL. This is an important pattern in production pipelines to prevent bad data from spreading to Gold.
 
-**Partition strategy** — Silver partition theo `order_year/order_month`. Query `WHERE order_year=2018 AND order_month=11` chỉ đọc 1 partition thay vì toàn bộ dataset.
+**Partition strategy** — Silver partitions by `order_year/order_month`. Query `WHERE order_year=2018 AND order_month=11` only reads 1 partition instead of the entire dataset.
 
 ---
 
 ## Dataset
 
-
-Dataset thực tế gồm 100k đơn hàng từ 2016–2018, bao gồm thông tin đơn hàng, khách hàng, sản phẩm, người bán, logistics và đánh giá.
+The actual dataset includes 100k orders from 2016–2018, containing order information, customers, products, sellers, logistics, and reviews.
 
 ---
 
