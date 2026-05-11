@@ -292,12 +292,6 @@ python visualize.py
 
 ---
 
-![Late Rate by State](charts/chart_late_rate_by_state.png)
-
-![Delivery Speed](charts/chart_delivery_speed.png)
-
----
-
 ## Key Technical Highlights
 
 **Schema-first approach** — Don't use `inferSchema=True`. All schemas are explicitly declared in `SPARK_SCHEMAS` and `EXPECTED_SCHEMAS`. This is a mandatory principle in Palantir Foundry to ensure data lineage.
